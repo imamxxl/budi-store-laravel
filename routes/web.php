@@ -3,6 +3,7 @@
 use App\Http\Controllers\admin\BarangController;
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\pimpinan\BarangController as PimpinanBarangController;
+use App\Http\Controllers\pimpinan\PembelianController;
 use App\Http\Controllers\pimpinan\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,15 @@ Route::get('/user/destroy/{id}', [UserController::class, 'destroy']);
 // CRUD Barang
 Route::get('/pimpinan/barang', [PimpinanBarangController::class, 'index'])->name('crud-barang');
 Route::post('/pimpinan/barang/store', [PimpinanBarangController::class, 'store']);
+Route::post('/pimpinan/barang/update/{id}', [PimpinanBarangController::class, 'update']);
+Route::get('/pimpinan/barang/delete/{id}', [PimpinanBarangController::class, 'delete']);
+Route::get('/pimpinan/barang/trash', [PimpinanBarangController::class, 'indexTrash'])->name('barang-trash');
+Route::get('/pimpinan/barang/destroy/{id}', [PimpinanBarangController::class, 'destroy']);
+Route::post('/pimpinan/barang/tambah/{id}', [PimpinanBarangController::class, 'tambah']);
+Route::get('/pimpinan/barang/restore/{id}', [PimpinanBarangController::class, 'restore']);
 
+// Pembelian
+Route::get('/pimpinan/pembelian', [PembelianController::class, 'index'])->name('pembelian');
 
 // For Admin
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

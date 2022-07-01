@@ -25,7 +25,7 @@
     <li class="{{ request()->is('pimpinan/barang', 'pimpinan/barang/trash') ? 'active' : '' }}">
         <a href="/pimpinan/barang"><i class="fa fa-file-text"></i> <span>Barang</span></a>
     </li>
-    <li>
+    <li class="{{ request()->is('pembelian') ? 'active' : '' }}">
         <a href="/pembelian"><i class="fa fa-pencil-square-o"></i> <span>Pembelian</span></a>
     </li>
     <li>

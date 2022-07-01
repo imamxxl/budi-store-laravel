@@ -5,15 +5,12 @@ namespace App\Http\Controllers\pimpinan;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BarangController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         $barang = Barang::all();
@@ -27,48 +24,37 @@ class BarangController extends Controller
         return view('pimpinan.barang.barang', compact('barang', 'kode_barang'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
+        // proses validasi data
         $validator = Validator::make(
             $request->all(),
             [
-                'kode_barang' => 'required|unique:users,username|min:3|max:12',
-                'photo' => 'mimes:jpg,jpeg,png|max:1024',
+                'kode_barang' => 'required|unique:barangs|min:3|max:12',
+                'photo' => 'required|mimes:jpg,jpeg,png|max:1024',
                 'nama_barang' => 'required',
-                'stok' => 'required',
-                'harga' => 'required',
+                'stok' => 'numeric|required',
+                'harga' => 'numeric|required',
                 'satuan' => 'required',
             ],
             [
                 'kode_barang.required' => 'Wajib diisi.',
-                'kode_barang.unique' => 'Username ini ini sudah ada. Masukkan kode lain atau lihat data user yang telah dinonaktifkan.',
+                'kode_barang.unique' => 'Kode barang ini sudah ada. Masukkan kode lain atau lihat data user yang telah dinonaktifkan.',
                 'kode_barang.min' => 'Minimal 4 karakter Angka.',
                 'kode_barang.max' => 'Maksimal 12 karakter Angka.',
                 'nama_barang.required' => 'Wajib diisi.',
                 'stok.required' => 'Wajib diisi.',
+                'stok.numeric' => 'Harus angka.',
+                'harga.numeric' => 'Harus angka.',
                 'harga.required' => 'Wajib diisi.',
                 'satuan.required' => 'Wajib diisi.',
+                'photo.required' => 'Foto wajib ada.',
                 'photo.mimes' => 'Format tidak sesuai. Silahkan pilih format .jpg/.jpeg/.png.',
                 'photo.max' => 'Size file foto tidak boleh lebih dari 1024KB / 1 MB'
             ],
         );
 
+        // validasi data yang dikirim
         if ($validator->fails()) {
             return redirect('/pimpinan/barang')
                 ->withErrors($validator)
@@ -80,18 +66,9 @@ class BarangController extends Controller
         $created_at = date('Y-m-d H:i:s');
         $updated_at = date('Y-m-d H:i:s');
 
-        // if ($file == "") {
-        //     $fileName = "default.jpg";
-        // } else {
-        //     $photo = $request->file('avatar_pimpinan');
-        //     $fileName = $request->username_admin . '.' . $photo->getClientOriginalExtension();
-        //     $file->move(public_path('/avatar'), $fileName);
-        //     // $location = public_path('avatar/' . $fileName);
-        // }
-
         $data = $request->all();
 
-        // Save foto
+        // Save data ke dalam database
         $barang = new Barang();
         $barang->kode_barang = $request->kode_barang;
         $barang->nama_barang = $request->nama_barang;
@@ -99,61 +76,145 @@ class BarangController extends Controller
         $barang->harga = $request->harga;
         $barang->stok = $request->stok;
 
+        // save foto
         $file = $request->photo;
         $photo = $request->file('photo');
         $fileName = $request->kode_barang . '.' . $photo->getClientOriginalExtension();
         $file->move(public_path('/barang'), $fileName);
 
+        // save create_at dll
         $barang->barang_url = $fileName;
         $barang->created_at = $created_at;
         $barang->updated_at = $updated_at;
         $barang->save();
 
+        // redirect ke halaman awal
         return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Barang  $barang
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Barang $barang)
+    public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'edit_photo' => 'mimes:jpg,jpeg,png|max:1024',
+                'edit_nama_barang' => 'required',
+                'edit_harga' => 'numeric|required',
+                'edit_satuan' => 'required',
+            ],
+            [
+                'edit_nama_barang.required' => 'Wajib diisi.',
+                'edit_harga.required' => 'Wajib diisi.',
+                'edit_satuan.required' => 'Wajib diisi.',
+                'edit_harga.numeric' => 'Harus angka.',
+                'edit_photo.mimes' => 'Format tidak sesuai. Silahkan pilih format .jpg/.jpeg/.png.',
+                'edit_photo.max' => 'Size file foto tidak boleh lebih dari 1024KB / 1 MB'
+            ],
+        );
+
+        if ($validator->fails()) {
+            return redirect('/pimpinan/barang')
+                ->withErrors($validator)
+                ->withInput()
+                ->with('pesan-gagal', 'Data gagal diupdate. Mohon cek kembali data yang ingin diupdate!');
+        }
+
+        // updated_at
+        $updated_at = date('Y-m-d H:i:s');
+
+        // Insert Tabel Barang
+        $barang = new Barang();
+        $barang = Barang::find($id);
+        $barang->nama_barang = $request->edit_nama_barang;
+        $barang->harga = $request->edit_harga;
+        $barang->satuan = $request->edit_satuan;
+
+        $barang->updated_at = $updated_at;
+
+        if ($request->hasFile('edit_photo')) {
+            $photo = $request->file('edit_photo');
+            $filename = $request->barang_url . '.' . $photo->getClientOriginalExtension();
+            $photo->move(public_path('/barang'), $filename);
+            $barang->barang_url = $filename;
+
+            $oldFilename = $barang->avatar;
+            $barang->barang_url = $filename;
+            Storage::delete($oldFilename);
+        }
+
+        $barang->save();
+
+        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil diupdate.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Barang  $barang
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Barang $barang)
+
+    public function tambah(Request $request, $id)
     {
-        //
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'tambah_stok' => 'required|numeric',
+                'stok_tersedia' => 'required'
+            ],
+            [
+                'tambah_stok.required' => 'Wajib diisi.',
+                'tambah_stok.numeric' => 'Harus angka.',
+                'stok_tersedia.required' => 'Wajib diisi'
+            ],
+        );
+
+        if ($validator->fails()) {
+            return redirect('/pimpinan/barang')
+                ->withErrors($validator)
+                ->withInput()
+                ->with('pesan-gagal', 'Data gagal ditambah. Mohon cek kembali data yang ingin ditambahkan!');
+        }
+
+        $barang = new Barang();
+        $barang = Barang::find($id);
+
+        $stok_awal = $request->stok_tersedia;
+        $stok_tambahan = $request->tambah_stok;
+
+        $stok_akhir = $stok_awal + $stok_tambahan;
+
+        $barang->stok = $stok_akhir;
+        $barang->save();
+
+        dd($stok_awal);
+
+        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil ditambahkan.');
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Barang  $barang
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Barang $barang)
+    public function restore($id)
     {
-        //
+        $barang = Barang::onlyTrashed()->where('id', $id);
+        $barang->restore();
+        return redirect()->route('barang-trash')->with('pesan-sukses', 'Data berhasil direstore.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Barang  $barang
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Barang $barang)
+    public function destroy($id)
     {
-        //
+        // hapus permanen data barang
+        $barang = Barang::onlyTrashed()->where('id', $id);
+        $barang->forceDelete();
+
+        return redirect()->route('barang-trash')->with('pesan-sukses', 'Data berhasil dihapus permanen.');
+    }
+
+    public function delete($id)
+    {
+        $barang = Barang::find($id);
+        $barang->delete();
+
+        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil dihapus.');
+    }
+
+    // Melihat user yang dihapus dan restore
+    function indexTrash()
+    {
+        $barang = Barang::onlyTrashed()->get();
+        return view('pimpinan.barang.barang_trash', compact('barang'));
     }
 }
