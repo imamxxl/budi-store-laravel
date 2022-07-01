@@ -67,7 +67,7 @@
                         data-target="#modal-add-admin">
                         Tambah User Admin
                     </button> --}}
-                    {{-- <a href="/user/nonaktif" class="btn btn-lg btn-default fa fa-eye"> Lihat User Nonaktif </a> --}}
+                    <a href="/user/nonaktif" class="btn btn-lg btn-default fa fa-eye"> Lihat User Nonaktif </a>
                 </div>
 
 

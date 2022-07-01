@@ -5,10 +5,10 @@
 @endsection
 
 @section('judul-halaman')
-    Barang
-@endBarangion
+    CRUD Barang
+@endsection
 
-@secBarang('navigasi-satu')
+@section('navigasi-satu')
     Barang
 @endsection
 
@@ -55,80 +55,48 @@
 
                 <!-- /.box-header -->
                 <div class="box-body">
-                    <button type="button" class="btn btn-lg btn-warning fa fa-plus" data-toggle="modal"
-                        data-target="#modal-add-mahasiswa">
-                        Tambah User Mahasiswa
-                    </button>
-                    <button type="button" class="btn btn-lg btn-primary fa fa-plus" data-toggle="modal"
-                        data-target="#modal-add-dosen">
-                        Tambah User Dosen
-                    </button>
                     <button type="button" class="btn btn-lg bg-purple color-palette fa fa-plus" data-toggle="modal"
                         data-target="#modal-add-admin">
-                        Tambah User Admin
+                        Tambah Barang
                     </button>
-                    <a href="/user/nonaktif" class="btn btn-lg btn-default fa fa-eye"> Lihat User Nonaktif </a>
+                    <a href="/pimpinan/barang/trash" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
                 </div>
 
 
                 <div class="card-body box-body table-hover">
 
-                    <!-- Table Users -->
+                    <!-- Table Barangs -->
                     <table id="datatableid" class="table table-bordered table-hover table-striped">
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Username</th>
-                                <th>Nama</th>
-                                <th>Jenis Kelamin</th>
-                                <th>Status</th>
-                                <th>level</th>
+                                <th>Foto</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Harga</th>
+                                <th>Stok</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $no = 1; ?>
-                            @foreach ($user as $data)
+                            @foreach ($barang as $data)
                                 <tr>
                                     <td class="content-header">{{ $no++ }}</td>
-                                    <td>{{ $data->username }}</td>
-                                    <td>{{ $data->nama }}</td>
-                                    <td>{{ $data->jk }}</td>
-                                    <!-- Status User -->
-                                    @if ($data->status == '1')
-                                        <td>
-                                            <span class="label label-success" data-id="{{ $data->status }}">Aktif</span>
-                                        </td>
-                                    @else
-                                        <td>
-                                            <span class="label label-danger" data-id="{{ $data->status }}">Nonaktif</span>
-                                        </td>
-                                    @endif
-                                    <!-- Level User -->
-                                    @if ($data->level == 'admin')
-                                        <td>
-                                            <span class="badge bg-purple" id="{{ $data->level }}">Admin<span>
-                                        </td>
-                                    @elseif ($data->level == 'dosen')
-                                        <td>
-                                            <span class="badge btn-primary" id="{{ $data->level }}">Dosen<span>
-                                        </td>
-                                    @else
-                                        <td>
-                                            <span class="badge btn-warning" id="{{ $data->level }}">Mahasiswa<span>
-                                        </td>
-                                    @endif
+                                    <td><img class="profile-user-img" src="{{ url('barang/' . $data->barang_url) }}"></td>
+                                    <td>{{ $data->kode_barang }}</td>
+                                    <td>{{ $data->nama_barang }}</td>
+                                    <td>{{ $data->satuan }}</td>
+                                    <td>{{ $data->harga }}</td>
+                                    <td>{{ $data->stok }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                            data-target="#modal-view{{ $data->id }}">
-                                            <i class="fa fa-fw fa-eye"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm bg-teal-active color-palette"
-                                            data-toggle="modal" data-target="#modal-change-password{{ $data->id }}">
-                                            <i class="fa fa-fw fa-key"></i>
+                                            data-target="#modal-edit{{ $data->id }}">
+                                            <i class="fa fa-fw fa-pencil"></i>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
-                                            data-target="#modal-nonaktif{{ $data->id }}">
+                                            data-target="#modal-delete{{ $data->id }}">
                                             <i class="fa fa-fw fa-trash"></i>
                                         </button>
                                     </td>
@@ -137,7 +105,7 @@
                         </tbody>
                     </table>
 
-                    <!-- Modal Add Admin-->
+                    <!-- Modal Add Barang-->
                     <div class="modal fade" id="modal-add-admin">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -145,101 +113,94 @@
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <h4 class="text-center modal-title">Tambah Data User Admin</h4>
-                                </div>
-
-                                <div class="modal-header">
-                                    <div class="callout bg-purple">
-                                        <p><b>Peringatan!!!</b><br>
-                                            Pastikan input data Admin sudah benar. Data <b>Admin</b>
-                                            yang sudah diinputkan merupakan data permanen yang tidak dapat diubah atau
-                                            dihapus untuk alasan keamanan.
-                                        </p>
-                                    </div>
+                                    <h4 class="text-center modal-title">Tambah Barang</h4>
                                 </div>
 
                                 <div class="modal-body">
-                                    <form action="/user/add/insert_user_admin" method="POST" enctype="multipart/form-data">
+                                    <form action="/pimpinan/barang/store" method="POST" id="upload-image-form"
+                                        enctype="multipart/form-data">
                                         @csrf
                                         <div class="box-body">
                                             <div class="form-group">
-                                                <label>Kode Admin</label>
+                                                <label>Kode Barang</label>
                                                 <label class="text-danger">*</label>
-                                                <input type="text" name="username_admin" class="form-control"
-                                                    value="{{ old('username_admin') }}" placeholder="Contoh: 5335">
+                                                <input type="text" name="kode_barang" class="form-control"
+                                                    value="{{ $kode_barang }}" placeholder="Contoh: P-3222" readonly>
                                                 <div class="text-danger">
-                                                    @error('username_admin')
+                                                    @error('kode_barang')
                                                         {{ $message }}
                                                     @enderror
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Nama Admin</label>
+                                                <label>Pilih Gambar</label>
                                                 <label class="text-danger">*</label>
-                                                <input type="text" name="nama_admin" class="form-control"
-                                                    value="{{ old('nama_admin') }}"
-                                                    placeholder="Contoh: Delsina Faiza, S.t.,M.t.">
-                                                <div class="text-danger">
-                                                    @error('nama_admin')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>NIP/NIDN/NUPN</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="text" name="nip_admin" class="form-control"
-                                                    value="{{ old('nip_admin') }}"
-                                                    placeholder="Contoh: 198304132009122002">
-                                                <div class="text-danger">
-                                                    @error('nip_admin')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>Jenis Kelamin</label>
-                                                <label class="text-danger">*</label>
-                                                <select class="form-control" id="jk_admin" name="jk_admin">
-                                                    <option value="">- Pilih Jenis Kelamin -</option>
-                                                    <option value="Laki-laki" @if (old('jk_admin') == 'Laki-laki') {{ 'selected' }} @endif>Laki-laki
-                                                    </option>
-                                                    <option value="Perempuan" @if (old('jk_admin') == 'Perempuan') {{ 'selected' }} @endif>Perempuan
-                                                    </option>
-                                                </select>
-                                                <div class="text-danger">
-                                                    @error('jk_admin')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Password</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="password" name="password_admin" class="form-control"
-                                                    value="{{ old('password_admin') }}"
-                                                    placeholder="Contoh: Password123">
-                                                <div class="text-danger">
-                                                    @error('password_admin')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Foto Admin</label>
-                                                <div class="text-danger">
-                                                    <p>Catatan : "Jika tidak memilih foto, maka foto akan
-                                                        didefault-kan."</p>
-                                                </div>
-                                                <input type="file" name="avatar_admin">
+                                                <input type="file" name="photo">
                                                 <p class="help-block">Masukkan foto dengan format ".jpg/.jpeg/.png"
                                                     (ukuran max: 1MB)</p>
                                                 <div class="text-danger">
-                                                    @error('avatar_admin')
+                                                    @error('photo')
                                                         {{ $message }}
                                                     @enderror
                                                 </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Nama Barang</label>
+                                                <label class="text-danger">*</label>
+                                                <input type="text" name="nama_barang" class="form-control"
+                                                    value="{{ old('nama_barang') }}" placeholder="Contoh: Deterjen">
+                                                <div class="text-danger">
+                                                    @error('nama_barang')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Satuan</label>
+                                                <label class="text-danger">*</label>
+                                                <select class="form-control" id="satuan" name="satuan">
+                                                    <option value="">- Pilih Satuan -</option>
+                                                    <option value="Pcs"
+                                                        @if (old('satuan') == 'Pcs') {{ 'selected' }} @endif>
+                                                        Pcs
+                                                    </option>
+                                                    <option value="Pack"
+                                                        @if (old('satuan') == 'Pack') {{ 'selected' }} @endif>
+                                                        Pack
+                                                    </option>
+                                                </select>
+                                                <div class="text-danger">
+                                                    @error('satuan')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Stok</label>
+                                                <label class="text-danger">*</label>
+                                                <input type="text" name="stok" class="form-control"
+                                                    placeholder="Contoh: 20">
+                                                <div class="text-danger">
+                                                    @error('stok')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Harga Satuan</label>
+                                                <label class="text-danger">*</label>
+                                                <div class="text-danger">
+                                                    @error('harga')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">Rp.</span>
+                                                <input type="text" class="form-control" name="harga">
+                                                <span class="input-group-addon">,-</span>
                                             </div>
                                             <div class="form-group">
                                                 <p>Keterangan: <a class="text-danger disabled">(*) Wajib diisi</a> </p>
@@ -259,356 +220,8 @@
                         <!-- /.modal add -->
                     </div>
 
-                    <!-- Modal Add Dosen-->
-                    <div class="modal fade" id="modal-add-dosen">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <h4 class="text-center modal-title">Tambah Data User Dosen</h4>
-                                </div>
-
-                                <div class="modal-header">
-                                    <div class="callout bg-primary">
-                                        <p><b>Peringatan!!!</b><br>
-                                            Pastikan input data Dosen sudah benar. Data <b>Dosen</b>
-                                            yang sudah diinputkan merupakan data permanen yang tidak dapat diubah atau
-                                            dihapus untuk alasan keamanan.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="modal-body">
-                                    <form action="/user/add/insert_user_dosen" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="box-body">
-                                            <div class="form-group">
-                                                <label>Kode Dosen</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="text" name="username_dosen" class="form-control"
-                                                    value="{{ old('username_dosen') }}" placeholder="Contoh: 5335">
-                                                <div class="text-danger">
-                                                    @error('username_dosen')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Nama Dosen</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="text" name="nama_dosen" class="form-control"
-                                                    value="{{ old('nama_dosen') }}"
-                                                    placeholder="Contoh: Delsina Faiza, S.t.,M.t.">
-                                                <div class="text-danger">
-                                                    @error('nama_dosen')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>NIP/NIDN/NUPN</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="text" name="nip_dosen" class="form-control"
-                                                    value="{{ old('nip_dosen') }}"
-                                                    placeholder="Contoh: 198304132009122002">
-                                                <div class="text-danger">
-                                                    @error('nip_dosen')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-
-                                                <label>Jenis Kelamin</label>
-                                                <label class="text-danger">*</label>
-                                                <select class="form-control" id="jk_dosen" name="jk_dosen">
-                                                    <option value="">- Pilih Jenis Kelamin -</option>
-                                                    <option value="Laki-laki" @if (old('jk_dosen') == 'Laki-laki') {{ 'selected' }} @endif>Laki-laki
-                                                    </option>
-                                                    <option value="Perempuan" @if (old('jk_dosen') == 'Perempuan') {{ 'selected' }} @endif>Perempuan
-                                                    </option>
-                                                </select>
-                                                <div class="text-danger">
-                                                    @error('jk_dosen')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Password</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="password" name="password_dosen" class="form-control"
-                                                    value="{{ old('password_dosen') }}"
-                                                    placeholder="Contoh: Password123">
-                                                <div class="text-danger">
-                                                    @error('password_dosen')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Foto Dosen</label>
-                                                <div class="text-danger">
-                                                    <p>Catatan : "Jika tidak memilih foto, maka foto akan
-                                                        didefault-kan."</p>
-                                                </div>
-                                                <input type="file" name="avatar_dosen">
-                                                <p class="help-block">Masukkan foto dengan format ".jpg/.jpeg/.png"
-                                                    (ukuran max: 1MB)</p>
-                                                <div class="text-danger">
-                                                    @error('avatar_dosen')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <p>Keterangan: <a class="text-danger disabled">(*) Wajib diisi</a> </p>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default btn-block"
-                                                data-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-primary btn-block" value="submit">Simpan
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-                        <!-- /.modal add -->
-                    </div>
-
-                    <!-- Modal Add Mahasiswa-->
-                    <div class="modal fade" id="modal-add-mahasiswa">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <h4 class="text-center modal-title">Tambah Data User Mahasiswa</h4>
-                                </div>
-
-                                <div class="modal-header">
-                                    <div class="callout callout-warning">
-                                        <p><b>Peringatan!!!</b><br>
-                                            Pastikan input data Mahasiswa sudah benar. Data <b>Mahasiswa</b>
-                                            yang sudah diinputkan merupakan data permanen yang tidak dapat diubah atau
-                                            dihapus untuk alasan keamanan.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="modal-body">
-                                    <form action="/user/add/insert_user_mahasiswa" method="POST"
-                                        enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="box-body">
-                                            <div class="form-group">
-                                                <label>NIM </label>
-                                                <label class="text-danger">*</label>
-                                                <input type="text" name="nim" class="form-control"
-                                                    value="{{ old('nim') }}" placeholder="Contoh: 16076040">
-                                                <div class="text-danger">
-                                                    @error('nim')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Nama Mahasiswa</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="text" name="nama_mahasiswa" class="form-control"
-                                                    value="{{ old('nama_mahasiswa') }}" placeholder="Contoh: Ahmad Imam">
-                                                <div class="text-danger">
-                                                    @error('nama_mahasiswa')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Tahun Masuk</label>
-                                                <label class="text-danger">*</label>
-                                                <select id="tahun" name="tahun" class="form-control ">
-                                                    <option value="">- Pilih Tahun Masuk -</option>
-                                                    {{ $last = date('Y') - 7 }}
-                                                    {{ $now = date('Y') }}
-                                                    @for ($i = $now; $i >= $last; $i--)
-                                                        <option value="{{ $i }}" @if (old('tahun') == $i) {{ 'selected ' }} @endif>
-                                                            {{ $i }}
-                                                        </option>
-                                                    @endfor
-                                                </select>
-                                                <div class="text-danger">
-                                                    @error('tahun')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Jenis Kelamin</label>
-                                                <label class="text-danger">*</label>
-                                                <select class="form-control" id="jk_mahasiswa" name="jk_mahasiswa">
-                                                    <option value="">- Pilih Jenis Kelamin -</option>
-                                                    <option value="Laki-laki" @if (old('jk_mahasiswa') == 'Laki-laki') {{ 'selected' }} @endif>Laki-laki
-                                                    </option>
-                                                    <option value="Perempuan" @if (old('jk_mahasiswa') == 'Perempuan') {{ 'selected' }} @endif>Perempuan
-                                                    </option>
-                                                </select>
-                                                <div class="text-danger">
-                                                    @error('jk_mahasiswa')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Jurusan</label>
-                                                <select class="form-control" name="kode_jurusan">
-                                                    <option value="">- Pilih Jurusan -</option>
-                                                    @foreach ($jurusan as $data)
-                                                        <option value="{{ $data->kode_jurusan }}" @if (old('kode_jurusan') == $data->kode_jurusan) {{ 'selected ' }} @endif>
-                                                            {{ $data->nama_jurusan }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <div class="text-danger">
-                                                    @error('kode_jurusan')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Grup</label>
-                                                <select class="form-control" name="kode_grup">
-                                                    <option value="">- Pilih Grup -</option>
-                                                    @foreach ($grup as $data)
-                                                        <option value="{{ $data->kode_grup }}" @if (old('kode_grup') == $data->kode_grup) {{ 'selected ' }} @endif>
-                                                            {{ $data->kode_grup }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <div class="text-danger">
-                                                    @error('kode_grup')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Password</label>
-                                                <label class="text-danger">*</label>
-                                                <input type="password" name="password_mahasiswa" class="form-control"
-                                                    value="{{ old('password_mahasiswa') }}"
-                                                    placeholder="Contoh: Password123">
-                                                <div class="text-danger">
-                                                    @error('password_mahasiswa')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Foto Mahasiswa</label>
-                                                <div class="text-danger">
-                                                    <p>Catatan : "Jika tidak memilih foto, maka foto akan
-                                                        didefault-kan."</p>
-                                                </div>
-                                                <input type="file" name="avatar_mahasiswa">
-                                                <p class="help-block">Masukkan foto dengan format ".jpg/.jpeg/.png"
-                                                    (ukuran max: 1MB)</p>
-                                                <div class="text-danger">
-                                                    @error('avatar_mahasiswa')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <p>Keterangan: <a class="text-danger disabled">(*) Wajib diisi</a> </p>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default btn-block"
-                                                data-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-warning btn-block" value="submit">Simpan
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-                        <!-- /.modal add -->
-                    </div>
-
-                    <!-- Modal View -->
-                    @foreach ($user as $data)
-                        <div class="modal fade" id="modal-view{{ $data->id }}">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title"> Detail {{ $data->nama }} </h4>
-                                    </div>
-                                    <div class="box-body box-profile">
-                                        <img class="profile-user-img img-responsive img"
-                                            src="{{ url('avatar/' . $data->avatar) }}" alt="User profile picture">
-
-                                        <h3 class="profile-username text-center">{{ $data->nama }}</h3>
-
-                                        <p class="text-muted text-center">{{ $data->kode_admin }}</p>
-
-                                        <ul class="list-group list-group-unbordered">
-                                            <li class="list-group-item">
-                                                <b>Jenis Kelamin</b>
-                                                <p class="pull-right">{{ $data->jk }}</p>
-                                            </li>
-                                            <li class="list-group-item">
-                                                <b>Status</b>
-                                                @if ($data->status == '1')
-
-                                                    <span class="pull-right label-lg label-success"
-                                                        data-id="{{ $data->status }}">Aktif</span>
-                                                @else
-                                                    <span class="pull-right label-lg label-danger"
-                                                        data-id="{{ $data->status }}">Nonaktif</span>
-                                                @endif
-                                            </li>
-                                            <li class="list-group-item">
-                                                <b>Level</b>
-                                                @if ($data->level == 'admin')
-                                                    <span class="pull-right bg-purple label-success"
-                                                        data-id="{{ $data->level }}">Admin</span>
-
-                                                @elseif ($data->level == 'dosen')
-                                                    <span class="pull-right label-lg btn-primary"
-                                                        data-id="{{ $data->level }}">Dosen</span>
-                                                @else
-                                                    <span class="pull-right label-lg label-warning"
-                                                        data-id="{{ $data->level }}">Mahasiswa</span>
-                                                @endif
-                                            </li>
-                                            <li class="list-group-item">
-                                                <b>Dibuat</b> <a class="pull-right">{{ $data->created_at }}</a>
-                                            </li>
-                                            <li class="list-group-item">
-                                                <b>Diupdate</b> <a class="pull-right">{{ $data->updated_at }}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-                        <!-- /.modal -->
-                    @endforeach
-
-                    <!-- Modal Change Password -->
-                    @foreach ($user as $data)
+                    {{-- <!-- Modal Change Password -->
+                    @foreach ($barang as $data)
                         <!-- Modal Add Admin-->
                         <div class="modal fade" id="modal-change-password{{ $data->id }}">
                             <div class="modal-dialog">
@@ -674,10 +287,10 @@
                             </div>
                             <!-- /.modal add -->
                         </div>
-                    @endforeach
+                    @endforeach --}}
 
-                    <!-- Modal Nonaktif-->
-                    @foreach ($user as $data)
+                    {{-- <!-- Modal Nonaktif-->
+                    @foreach ($barang as $data)
                         <div class="modal fade" id="modal-nonaktif{{ $data->id }}">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -704,7 +317,7 @@
                             <!-- /.modal-dialog -->
                         </div>
                         <!-- /.modal -->
-                    @endforeach
+                    @endforeach --}}
 
                 </div>
                 <!-- /.box-body -->

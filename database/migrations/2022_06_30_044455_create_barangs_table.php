@@ -16,9 +16,10 @@ class CreateBarangsTable extends Migration
         Schema::create('barangs', function (Blueprint $table) {
             $table->id();
             $table->string('kode_barang')->unique();
-            $table->string('nama_barang');
             $table->string('barang_url');
+            $table->string('nama_barang');
             $table->string('stok');
+            $table->string('satuan');
             $table->string('harga');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);

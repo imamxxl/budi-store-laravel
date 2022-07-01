@@ -34,8 +34,9 @@ Route::get('/user/restore/{id}', [UserController::class, 'restore']);
 Route::get('/user/destroy/{id}', [UserController::class, 'destroy']);
 
 // CRUD Barang
-Route::get('/pimpinan/barang', [PimpinanBarangController::class, 'index'])->name('barang');
-Route::post('/pimpinan/tambah_barang', [PimpinanBarangController::class, 'store']);
+Route::get('/pimpinan/barang', [PimpinanBarangController::class, 'index'])->name('crud-barang');
+Route::post('/pimpinan/barang/store', [PimpinanBarangController::class, 'store']);
+
 
 // For Admin
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

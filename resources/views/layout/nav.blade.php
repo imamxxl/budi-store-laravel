@@ -19,10 +19,10 @@
     <li class="{{ request()->is('dashboard_pimpinan') ? 'active' : '' }}">
         <a href="/dashboard_pimpinan"><i class="fa fa-dashboard"></i> <span>Dashboard</span> </a>
     </li>
-    <li class="{{ request()->is('user') ? 'active' : '' }}">
+    <li class="{{ request()->is('user', 'user/trash') ? 'active' : '' }}">
         <a href="/user"><i class="fa fa-user"></i> <span>CRUD User</span></a>
     </li>
-    <li class="{{ request()->is('pimpinan/barang') ? 'active' : '' }}">
+    <li class="{{ request()->is('pimpinan/barang', 'pimpinan/barang/trash') ? 'active' : '' }}">
         <a href="/pimpinan/barang"><i class="fa fa-file-text"></i> <span>Barang</span></a>
     </li>
     <li>

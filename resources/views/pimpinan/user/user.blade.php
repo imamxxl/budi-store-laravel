@@ -63,7 +63,7 @@
                         data-target="#modal-tambah-admin">
                         Tambah User Admin
                     </button>
-                    <a href="/user/trash" class="btn btn-lg btn-danger fa fa-trash"> Tong Sampah </a>
+                    <a href="/user/trash" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
                     {{-- <button type="button" class="btn btn-lg btn-primary fa fa-plus" data-toggle="modal"
                         data-target="#modal-add-dosen">
                         Tambah User Dosen

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    // Melihat tampilan index user
     public function index()
     {
 
@@ -31,12 +32,14 @@ class UserController extends Controller
         return view('pimpinan.user.user', compact('pimpinan', 'admin', 'user'));
     }
 
+    // Melihat user yang dihapus dan restore
     function indexTrash()
     {
         $user = User::onlyTrashed()->get();
         return view('pimpinan.user.user_trash', compact('user'));
     }
 
+    // Menyimpan data pimpinan
     public function storePimpinan(Request $request)
     {
         $validator = Validator::make(
@@ -79,7 +82,7 @@ class UserController extends Controller
         } else {
             $photo = $request->file('avatar_pimpinan');
             $fileName = $request->username_admin . '.' . $photo->getClientOriginalExtension();
-            $file->move(public_path('public/avatar'), $fileName);
+            $file->move(public_path('/avatar'), $fileName);
             // $location = public_path('avatar/' . $fileName);
         }
 
@@ -99,6 +102,7 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
+    // Menyimpan data admin
     public function storeAdmin(Request $request)
     {
         $validator = Validator::make(
@@ -141,7 +145,7 @@ class UserController extends Controller
         } else {
             $photo = $request->file('avatar_admin');
             $fileName = $request->username_admin . '.' . $photo->getClientOriginalExtension();
-            $file->move(public_path('public/avatar'), $fileName);
+            $file->move(public_path('/avatar'), $fileName);
             // $location = public_path('avatar/' . $fileName);
         }
 
@@ -161,6 +165,7 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
+    // update data user
     public function update(Request $request, $id)
     {
         $validator = Validator::make(
@@ -217,6 +222,7 @@ class UserController extends Controller
         }
     }
 
+    // softdelete user
     function delete($id)
     {
         $user = User::find($id);
@@ -225,6 +231,7 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil dihapus.');
     }
 
+    // restore data user yang dihapus
     function restore($id)
     {
         $user = User::onlyTrashed()->where('id', $id);
@@ -232,6 +239,7 @@ class UserController extends Controller
         return redirect()->route('trash')->with('pesan-sukses', 'Data berhasil direstore.');
     }
 
+    // delete data permanen
     function destroy($id)
     {
         // hapus permanen data user
