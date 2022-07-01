@@ -63,6 +63,7 @@
                         data-target="#modal-tambah-admin">
                         Tambah User Admin
                     </button>
+                    <a href="/user/trash" class="btn btn-lg btn-danger fa fa-trash"> Tong Sampah </a>
                     {{-- <button type="button" class="btn btn-lg btn-primary fa fa-plus" data-toggle="modal"
                         data-target="#modal-add-dosen">
                         Tambah User Dosen
@@ -341,17 +342,17 @@
                                     </div>
 
                                     <div class="modal-body">
-                                        <form action="/user/edit/{{ $data->id }}" method="POST"
+                                        <form action="/user/update/{{ $data->id }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="box-body">
                                                 <div class="form-group">
                                                     <label>Username</label>
                                                     <label class="text-danger">*</label>
-                                                    <input type="text" name="username_edit" class="form-control"
+                                                    <input type="text" name="edit_username" class="form-control"
                                                         value="{{ $data->username }}" readonly>
                                                     <div class="text-danger">
-                                                        @error('username_edit')
+                                                        @error('edit_username')
                                                             {{ $message }}
                                                         @enderror
                                                     </div>
@@ -452,7 +453,7 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default pull-left"
                                             data-dismiss="modal">Tidak</button>
-                                        <a href="/user/nonaktif/{{ $data->id }}" class="btn btn-danger">Ya!</a>
+                                        <a href="/user/delete/{{ $data->id }}" class="btn btn-danger">Ya!</a>
                                     </div>
                                 </div>
                                 <!-- /.modal-content -->

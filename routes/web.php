@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\admin\BarangController;
 use App\Http\Controllers\admin\DashboardController;
+use App\Http\Controllers\pimpinan\BarangController as PimpinanBarangController;
 use App\Http\Controllers\pimpinan\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,11 +23,19 @@ use Illuminate\Support\Facades\Route;
 
 // For Pimpinan
 
+// CRUD User
 Route::get('/user', [UserController::class, 'index'])->name('user');
 Route::post('/user/tambah_admin', [UserController::class, 'storeAdmin']);
 Route::post('/user/tambah_pimpinan', [UserController::class, 'storePimpinan']);
-Route::post('/user/edit/{id}', [UserController::class, 'update']);
-Route::post('/user/delete/{id}', [UserController::class, 'destroy']);
+Route::post('/user/update/{id}', [UserController::class, 'update']);
+Route::get('/user/delete/{id}', [UserController::class, 'delete']);
+Route::get('/user/trash', [UserController::class, 'indexTrash'])->name('trash');
+Route::get('/user/restore/{id}', [UserController::class, 'restore']);
+Route::get('/user/destroy/{id}', [UserController::class, 'destroy']);
+
+// CRUD Barang
+Route::get('/pimpinan/barang', [PimpinanBarangController::class, 'index'])->name('barang');
+Route::post('/pimpinan/tambah_barang', [PimpinanBarangController::class, 'store']);
 
 // For Admin
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

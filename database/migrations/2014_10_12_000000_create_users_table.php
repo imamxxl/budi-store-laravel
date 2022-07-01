@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('level');
             $table->string('avatar');
             $table->timestamps();
+            $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }
 

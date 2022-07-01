@@ -21,6 +21,7 @@ class CreateBarangsTable extends Migration
             $table->string('stok');
             $table->string('harga');
             $table->timestamps();
+            $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }
 

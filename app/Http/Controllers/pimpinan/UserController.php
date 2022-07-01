@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 
@@ -16,7 +17,8 @@ class UserController extends Controller
     public function index()
     {
 
-        $user = DB::table('users')->get();
+        // $user = DB::table('users')->get();
+        $user = User::All();
 
         // making user unique
         $identity_admin = 'ADM';
@@ -27,6 +29,12 @@ class UserController extends Controller
         $pimpinan = $identity_pimpinan . $random_number;
 
         return view('pimpinan.user.user', compact('pimpinan', 'admin', 'user'));
+    }
+
+    function indexTrash()
+    {
+        $user = User::onlyTrashed()->get();
+        return view('pimpinan.user.user_trash', compact('user'));
     }
 
     public function storePimpinan(Request $request)
@@ -153,19 +161,83 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
-    public function update(Request $request) {
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'edit_nama' => 'required',
+                'edit_jk' => 'required',
+                'edit_level' => 'required',
+                'avatar_mahasiswa' => 'mimes:jpg,jpeg,png|max:1024'
 
+            ],
+            [
+                'edit_nama.required' => 'Wajib diisi.',
+                'edit_jk.required' => 'Wajib diisi.',
+                'edit_level.required' => 'Wajib diisi.',
+                'avatar_mahasiswa.mimes' => 'Format tidak sesuai. Silahkan pilih format .jpg/.jpeg/.png.',
+                'avatar_mahasiswa.max' => 'Size file foto tidak boleh lebih dari 1024KB / 1 MB'
+            ],
+        );
+
+        if ($validator->fails()) {
+            return redirect('/user')
+                ->withErrors($validator)
+                ->withInput()
+                ->with('pesan-gagal', 'Data gagal diupdate. Mohon cek kembali data yang ingin diupdate!');
+        }
+
+        // updated_at
+        $updated_at = date('Y-m-d H:i:s');
+
+        $password = $request->edit_password;
+        if ($password == "") {
+            $user = new User;
+            $user = User::find($id);
+            $user->nama = $request->edit_nama;
+            $user->jk = $request->edit_jk;
+            $user->level = $request->edit_level;
+            $user->updated_at = $updated_at;
+            $user->update();
+
+            return redirect()->route('user')->with('pesan-sukses', 'Data berhasil diupdate.');
+
+        } else {
+            $user = new User;
+            $user = User::find($id);
+            $user->nama = $request->edit_nama;
+            $user->jk = $request->edit_jk;
+            $user->password = Hash::make($request->edit_password);
+            $user->level = $request->edit_level;
+            $user->updated_at = $updated_at;
+            $user->update();
+
+            return redirect()->route('user')->with('pesan-sukses', 'Data berhasil diupdate.');
+        }
+    }
+
+    function delete($id)
+    {
+        $user = User::find($id);
+        $user->delete();
+
+        return redirect()->route('user')->with('pesan-sukses', 'Data berhasil dihapus.');
+    }
+
+    function restore($id)
+    {
+        $user = User::onlyTrashed()->where('id', $id);
+        $user->restore();
+        return redirect()->route('trash')->with('pesan-sukses', 'Data berhasil direstore.');
     }
 
     function destroy($id)
     {
-        $nonaktif = "0";
+        // hapus permanen data user
+        $user = User::onlyTrashed()->where('id', $id);
+        $user->forceDelete();
 
-        $user = User::find($id);
-        $user->status = $nonaktif;
-
-        $user->update();
-
-        return redirect()->route('user')->with('pesan-sukses', 'Data berhasil dinonaktifkan. Silahkan tekan tombol "Data User Nonaktif" untuk melihat Data yang telah dinonaktifkan.');
+        return redirect()->route('trash')->with('pesan-sukses', 'Data berhasil dihapus permanen.');
     }
 }
