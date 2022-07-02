@@ -91,11 +91,11 @@
                                         <a href="#" class="btn btn-default btn-flat">Profile</a>
                                     </div>
                                     <div class="pull-right">
-                                        {{-- <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST"
                                             class="d-none">
                                             @csrf
                                             <button type="submit" class="btn btn-default btn-flat">Log out</button>
-                                        </form> --}}
+                                        </form>
                                     </div>
                                 </li>
                             </ul>
