@@ -17,6 +17,9 @@ class CreateTransaksisTable extends Migration
             $table->id();
             $table->string('invoice');
             $table->date('tanggal')->nullable();
+            $table->integer('grand_total')->nullable();
+            $table->integer('total_bayar')->nullable();
+            $table->integer('kembalian')->nullable();
             $table->boolean('status')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

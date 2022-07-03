@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\PembelianController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 
 // Route untuk Logina
 Route::get('/login', [LoginController::class, 'index'])->name('login');
@@ -33,6 +32,9 @@ Route::group(['middleware' => ['auth', 'ceklevel:pimpinan,admin']], function () 
         return view('welcome');
     });
 
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     // CRUD Barang
     Route::get('/semua-barang', [BarangController::class, 'index'])->name('semua-barang');
     Route::post('/post-barang', [BarangController::class, 'postBarang'])->name('post-barang');
@@ -43,18 +45,15 @@ Route::group(['middleware' => ['auth', 'ceklevel:pimpinan,admin']], function () 
     Route::get('/delete-barang/{id}', [BarangController::class, 'delete'])->name('delete-barang');
     Route::get('/destroy-barang/{id}', [BarangController::class, 'destroy'])->name('destroy-barang');
 
-    // Pembelian
-    Route::get('/pimpinan/pembelian', [PembelianController::class, 'index'])->name('pembelian');
-    Route::post('/beli-barang/{id}', [PembelianController::class, 'beli'])->name('beli');
-
     // transaksi
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
-    // Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
-    Route::post('/post-chekout/{id}', [TransaksiController::class, 'postChekout'])->name('post-chekout');
+    Route::post('/post-belanja', [TransaksiController::class, 'postBelanja'])->name('post-belanja');
+    Route::post('/post-pembelian', [TransaksiController::class, 'postPembelian'])->name('post-pembelian');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/barang', [BarangController::class, 'index'])->name('barang');
-    Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian');
+//    // belanja
+//     Route::post('/post-chekout/{id}', [TransaksiController::class, 'postChekout'])->name('post-chekout');
+//     Route::get('/barang', [BarangController::class, 'index'])->name('barang');
+//     Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian');
 });
 
 // Login khusus untuk pimpinan

@@ -31,20 +31,6 @@
             {{ session('pesan-gagal') }}
         </div>
     @endif
-    @if (session('password-sukses'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h4><i class="icon fa fa-check"></i> Sukses </h4>
-            {{ session('password-sukses') }}
-        </div>
-    @endif
-    @if (session('password-gagal'))
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h4><i class="icon fa fa-ban"></i> Gagal </h4>
-            {{ session('password-gagal') }}
-        </div>
-    @endif
 
     <!-- Main content -->
     <section class="content">
@@ -59,17 +45,16 @@
                         <div class="box-body">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Tanggal</label>
-                                <input type="email" class="form-control" id="exampleInputEmail1" name="tanggal"
-                                    value="{{ date('d-m-Y') }}" readonly>
+                                @foreach ($transaksi as $item)
+                                    <input type="email" class="form-control" id="exampleInputEmail1" name="tanggal"
+                                        value="{{ date('d-m-Y', strtotime($item->tanggal)) }}" readonly>
+                                @endforeach
                             </div>
                             <div class="form-group">
-
-                                <label for="exampleInputPassword1">User</label>
-                                <select class="form-control" name="pilih barang" disabled>
+                                <label>User</label>
+                                <select class="form-control" name="user" disabled>
                                     <option value="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}
                                         ({{ Auth::user()->level }}</option>
-                                    {{-- <input type="text" class="form-control" id="exampleInputPassword1" value=""
-                                        readonly> --}}
                                 </select>
                             </div>
                         </div>
@@ -77,40 +62,46 @@
                     </form>
                 </div>
             </div>
-            <!--/.col (left) -->
 
             <!-- kolom tengah -->
             <div class="col-md-4">
                 <div class="box box-warning">
-                    <div class="box-body">
-                        <form role="form">
-                            <!-- pilih kode barang -->
+                    <form action="{{ route('post-pembelian') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="box-body">
                             <div class="form-group">
                                 <label>Kode Barang</label>
-                                <select class="form-control" name="pilih barang">
+                                <select class="form-control" name="kode_barang">
                                     <option value="">-- Pilih Barang --</option>
                                     @foreach ($barang as $item)
-                                        <option value="{{ $item->id_barang }}">{{ $item->kode_barang }} -
+                                        <option value="{{ $item->id }}">{{ $item->kode_barang }} -
                                             {{ $item->nama_barang }}</option>
                                     @endforeach
                                 </select>
+                                <div class="text-danger">
+                                    @error('kode_barang')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Qty</label>
-                                <input type="text" class="form-control" value="1">
+                                <label class="text-danger">*</label>
+                                <input type="text" name="qty" class="form-control" value="1">
+                                <div class="text-danger">
+                                    @error('qty')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
                             </div>
-                        </form>
-                        <!-- /.box-body -->
-                        <div class="box-footer">
-                            <button type="submit" class="btn btn-success"> <i class="fa fa-fw fa-shopping-cart"></i>
-                                Tambahkan</button>
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-success btn-block" value="submit"><i
+                                        class="fa fa-fw fa-shopping-cart"></i> Tambahkan </button>
+                            </div>
                         </div>
-                    </div>
-                    <!-- /.box-body -->
+                    </form>
                 </div>
-                <!-- /.box -->
             </div>
-            <!--/.col kolom tengah -->
 
             <!-- kolom kanan -->
             <div class="col-md-4">
@@ -121,19 +112,17 @@
                             <!-- text input -->
                             <div class="form-group">
                                 <label>Invoice</label>
-                                <p style="font-size:2vw"> <b>T-12HSJ232S</b></p>
+                                @foreach ($transaksi as $item)
+                                    <p style="font-size:2vw"> <b>{{ $item->invoice }}</b></p>
+                                @endforeach
                             </div>
                             <div class="form-group">
-                                <p style="font-size:4vw"> <b>Rp. 30000</b></p>
+                                <p style="font-size:4vw"> <b>Rp. 0,-</b></p>
                             </div>
                         </form>
                     </div>
-                    <!-- /.box-body -->
                 </div>
-                <!-- /.box -->
             </div>
-            <!--/.col kolom kanan -->
-
         </div>
         <!-- /.row -->
     </section>
@@ -143,7 +132,7 @@
         <div class="row">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title center">Daftar Barang</h3>
+                    <h3 class="box-title center">Daftar Barang yang akan dibeli</h3>
                 </div>
 
                 <div class="card-body box-body table-hover">
@@ -154,22 +143,28 @@
                             <tr>
                                 <th>No</th>
                                 <th>Foto</th>
-                                <th>Nama Barang</th>
+                                <th>Kode</th>
+                                <th>Nama</th>
+                                <th>Qty</th>
                                 <th>Harga</th>
-                                <th>Stok Tersedia</th>
+                                <th>Discount (5%)</th>
+                                <th>Total</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $no = 1; ?>
-                            @foreach ($barang as $data)
+                            @foreach ($tmp as $data)
                                 <tr>
                                     <td class="content-header">{{ $no++ }}</td>
                                     <td><img class="profile-user-img" src="{{ url('barang/' . $data->barang_url) }}">
                                     </td>
+                                    <td>{{ $data->kode_barang }}</td>
                                     <td>{{ $data->nama_barang }}</td>
-                                    <td>Rp. {{ $data->harga }}/{{ $data->satuan }}</td>
-                                    <td>{{ $data->stok }} {{ $data->satuan }}</td>
+                                    <td>{{ $data->quantity }}</td>
+                                    <td>Rp. {{ $data->harga }}</td>
+                                    <td>{{ $data->discount }}</td>
+                                    <td>{{ $data->stok }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm bg-blue" data-toggle="modal"
                                             data-target="#modal-edit{{ $data->id }}">
@@ -179,21 +174,13 @@
                                             data-target="#modal-hapus{{ $data->id }}">
                                             <i class="fa fa-fw fa-trash"></i>
                                         </button>
-                                        {{-- <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                            data-target="#modal-edit{{ $data->id }}">
-                                            <i class="fa fa-fw fa-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
-                                            data-target="#modal-delete{{ $data->id }}">
-                                            <i class="fa fa-fw fa-trash"></i>
-                                        </button> --}}
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
 
-                    <!-- Modal Beli Barang -->
+                    {{-- <!-- Modal Beli Barang -->
                     @foreach ($barang as $data)
                         <div class="modal fade" id="modal-beli{{ $data->id }}">
                             <div class="modal-dialog">
@@ -270,7 +257,7 @@
                             </div>
                             <!-- /.modal add -->
                         </div>
-                    @endforeach
+                    @endforeach --}}
 
                     {{-- <!-- Modal Edit Data -->
                     @foreach ($pembelian as $data)

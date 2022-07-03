@@ -212,9 +212,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <!-- /.modal-dialog -->
                         </div>
-                        <!-- /.modal add -->
                     </div>
 
                     <!-- Modal Add Admin-->

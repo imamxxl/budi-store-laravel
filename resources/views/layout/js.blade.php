@@ -61,23 +61,6 @@
 </script>
 
 <script>
-    //  tabel lookup mahasiswa
-    $(function() {
-        $("#lihat_mahasiswa").dataTable();
-    });
-</script>
-
-<script>
-    // $(document).on('click', '.pilih', function(e) {
-    //     document.getElementById("nim").value = $(this).attr('data-nim');
-    //     document.getElementById("user_id").value = $(this).attr('data-id');
-    //     document.getElementById("nama_mahasiswa").value = $(this).attr('data-nama');
-    //     document.getElementById("imei").value = $(this).attr('data-imei');
-    //     $('#modal-add').modal('hide');
-    // });
-</script>
-
-<script>
     $('#datepicker').datepicker({
         autoclose: true
     })
