@@ -53,15 +53,6 @@
                     <h3 class="box-title center">Daftar Barang</h3>
                 </div>
 
-                {{-- <!-- /.box-header -->
-                <div class="box-body">
-                    <button type="button" class="btn btn-lg bg-purple color-palette fa fa-plus" data-toggle="modal"
-                        data-target="#modal-add-barang">
-                        Tambah Barang
-                    </button>
-                    <a href="/pimpinan/barang/trash" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
-                </div> --}}
-
 
                 <div class="card-body box-body table-hover">
 
@@ -105,7 +96,7 @@
                         </tbody>
                     </table>
 
-                    <!-- Modal Tambah Stok -->
+                    <!-- Modal Beli Barang -->
                     @foreach ($barang as $data)
                         <div class="modal fade" id="modal-beli{{ $data->id }}">
                             <div class="modal-dialog">
@@ -118,14 +109,15 @@
                                     </div>
 
                                     <div class="modal-body">
-                                        <form action="/pimpinan/barang/tambah/{{ $data->id }}" method="POST"
+                                        <form action="/beli-barang/{{ $data->id }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="box-body">
                                                 <div class="form-group">
                                                     <label>Stok Tersedia</label>
                                                     <label class="text-danger">*</label>
-                                                    <input type="text" name="stok_tersedia" class="form-control" value="{{ $data->stok }}" readonly>
+                                                    <input type="text" name="stok_tersedia" class="form-control"
+                                                        value="{{ $data->stok }}" readonly>
                                                     <div class="text-danger">
                                                         @error('stok_tersedia')
                                                             {{ $message }}
@@ -133,11 +125,35 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Tambah Stok</label>
+                                                    <label>Harga Satuan</label>
                                                     <label class="text-danger">*</label>
-                                                    <input type="text" name="tambah_stok" class="form-control" placeholder="Contoh: 200">
+                                                    <input type="text" name="harga_satuan" class="form-control"
+                                                        id="harga" value="{{ $data->harga }}/{{ $data->satuan }}"
+                                                        readonly>
                                                     <div class="text-danger">
-                                                        @error('tambah_stok')
+                                                        @error('harga_satuan')
+                                                            {{ $message }}
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Quantity</label>
+                                                    <label class="text-danger">*</label>
+                                                    <input type="text" name="qty" class="form-control" id="qty"
+                                                        placeholder="Contoh: 5">
+                                                    <div class="text-danger">
+                                                        @error('qty')
+                                                            {{ $message }}
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Total Biaya</label>
+                                                    <label class="text-danger">*</label>
+                                                    <input type="text" name="total_biaya" class="form-control"
+                                                        placeholder="-" id="total_biaya" readonly>
+                                                    <div class="text-danger">
+                                                        @error('total_biaya')
                                                             {{ $message }}
                                                         @enderror
                                                     </div>
@@ -146,8 +162,7 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default btn-block"
                                                     data-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-success btn-block"
-                                                    value="submit">Tambah stok {{ $data->nama_barang }}
+                                                <button type="submit" class="btn bg-orange btn-block" value="submit"> Beli
                                                 </button>
                                             </div>
                                         </form>
@@ -299,4 +314,18 @@
         </div>
         <!-- /.row -->
     </section>
+
+    <!-- jQuery 3 -->
+    <script src="{{ asset('template') }}/bower_components/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        $("#qty").keyup(function() {
+            qty = parseInt($(this).val())
+            harga = parseInt($('#harga').val().split("/")[0]);
+
+            console.log((qty * harga));
+
+            $('#total_biaya').val(qty * harga);
+        });
+    </script>
 @endsection

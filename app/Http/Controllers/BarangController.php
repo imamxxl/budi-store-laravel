@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\pimpinan;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
@@ -15,18 +15,23 @@ class BarangController extends Controller
     {
         $barang = Barang::all();
 
-        // Membuat identity Kode barang
+        // membuat identitas barang
         $identity_barang = 'P';
         $random_number = random_int(1000, 9999);
 
         $kode_barang = $identity_barang . '-' . $random_number;
 
-        return view('pimpinan.barang.barang', compact('barang', 'kode_barang'));
+        return view('page.barang.barang', compact('barang', 'kode_barang'));
     }
 
-    public function store(Request $request)
+    function indexRecycle()
     {
-        // proses validasi data
+        $barang = Barang::onlyTrashed()->get();
+        return view('page.barang.recycle-barang', compact('barang'));
+    }
+
+    public function postBarang(Request $request)
+    {
         $validator = Validator::make(
             $request->all(),
             [
@@ -54,21 +59,19 @@ class BarangController extends Controller
             ],
         );
 
-        // validasi data yang dikirim
         if ($validator->fails()) {
-            return redirect('/pimpinan/barang')
+            return redirect()
+                ->route('semua-barang')
                 ->withErrors($validator)
                 ->withInput()
                 ->with('pesan-gagal', 'Data gagal ditambahkan. Mohon cek kembali data yang ingin dimasukkan!');
         }
 
-        // created_at & updated_at
         $created_at = date('Y-m-d H:i:s');
         $updated_at = date('Y-m-d H:i:s');
 
         $data = $request->all();
 
-        // Save data ke dalam database
         $barang = new Barang();
         $barang->kode_barang = $request->kode_barang;
         $barang->nama_barang = $request->nama_barang;
@@ -76,20 +79,17 @@ class BarangController extends Controller
         $barang->harga = $request->harga;
         $barang->stok = $request->stok;
 
-        // save foto
         $file = $request->photo;
         $photo = $request->file('photo');
         $fileName = $request->kode_barang . '.' . $photo->getClientOriginalExtension();
         $file->move(public_path('/barang'), $fileName);
 
-        // save create_at dll
         $barang->barang_url = $fileName;
         $barang->created_at = $created_at;
         $barang->updated_at = $updated_at;
         $barang->save();
 
-        // redirect ke halaman awal
-        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil ditambahkan.');
+        return redirect()->route('semua-barang')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
     public function update(Request $request, $id)
@@ -113,16 +113,15 @@ class BarangController extends Controller
         );
 
         if ($validator->fails()) {
-            return redirect('/pimpinan/barang')
+            return redirect()
+                ->route('semua-barang')
                 ->withErrors($validator)
                 ->withInput()
                 ->with('pesan-gagal', 'Data gagal diupdate. Mohon cek kembali data yang ingin diupdate!');
         }
 
-        // updated_at
         $updated_at = date('Y-m-d H:i:s');
 
-        // Insert Tabel Barang
         $barang = new Barang();
         $barang = Barang::find($id);
         $barang->nama_barang = $request->edit_nama_barang;
@@ -144,11 +143,10 @@ class BarangController extends Controller
 
         $barang->save();
 
-        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil diupdate.');
+        return redirect()->route('semua-barang')->with('pesan-sukses', 'Data berhasil diupdate.');
     }
 
-
-    public function tambah(Request $request, $id)
+    public function postStok(Request $request, $id)
     {
         $validator = Validator::make(
             $request->all(),
@@ -164,7 +162,8 @@ class BarangController extends Controller
         );
 
         if ($validator->fails()) {
-            return redirect('/pimpinan/barang')
+            return redirect()
+                ->route('semua-barang')
                 ->withErrors($validator)
                 ->withInput()
                 ->with('pesan-gagal', 'Data gagal ditambah. Mohon cek kembali data yang ingin ditambahkan!');
@@ -181,17 +180,15 @@ class BarangController extends Controller
         $barang->stok = $stok_akhir;
         $barang->save();
 
-        dd($stok_awal);
-
-        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil ditambahkan.');
-
+        return redirect()->route('semua-barang')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
     public function restore($id)
     {
         $barang = Barang::onlyTrashed()->where('id', $id);
         $barang->restore();
-        return redirect()->route('barang-trash')->with('pesan-sukses', 'Data berhasil direstore.');
+        
+        return redirect()->route('recycle-barang')->with('pesan-sukses', 'Data berhasil direstore.');
     }
 
     public function destroy($id)
@@ -200,7 +197,7 @@ class BarangController extends Controller
         $barang = Barang::onlyTrashed()->where('id', $id);
         $barang->forceDelete();
 
-        return redirect()->route('barang-trash')->with('pesan-sukses', 'Data berhasil dihapus permanen.');
+        return redirect()->route('recycle-barang')->with('pesan-sukses', 'Data berhasil dihapus permanen.');
     }
 
     public function delete($id)
@@ -208,13 +205,6 @@ class BarangController extends Controller
         $barang = Barang::find($id);
         $barang->delete();
 
-        return redirect()->route('crud-barang')->with('pesan-sukses', 'Data berhasil dihapus.');
-    }
-
-    // Melihat user yang dihapus dan restore
-    function indexTrash()
-    {
-        $barang = Barang::onlyTrashed()->get();
-        return view('pimpinan.barang.barang_trash', compact('barang'));
+        return redirect()->route('semua-barang')->with('pesan-sukses', 'Data berhasil dihapus.');
     }
 }

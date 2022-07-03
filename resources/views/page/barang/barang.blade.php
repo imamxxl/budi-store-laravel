@@ -1,7 +1,7 @@
 @extends('layout.template')
 
 @section('title')
-    Barang | Budi Store
+    CRUD Barang | Budi Store
 @endsection
 
 @section('judul-halaman')
@@ -9,7 +9,7 @@
 @endsection
 
 @section('navigasi-satu')
-    Barang
+    CRUD Barang
 @endsection
 
 @section('bagian-nav')
@@ -31,35 +31,21 @@
             {{ session('pesan-gagal') }}
         </div>
     @endif
-    @if (session('password-sukses'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h4><i class="icon fa fa-check"></i> Sukses </h4>
-            {{ session('password-sukses') }}
-        </div>
-    @endif
-    @if (session('password-gagal'))
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <h4><i class="icon fa fa-ban"></i> Gagal </h4>
-            {{ session('password-gagal') }}
-        </div>
-    @endif
+
     <!-- Main content -->
     <section class="content">
         <div class="row">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title center">Data User</h3>
+                    <h3 class="box-title center">Data Barang</h3>
                 </div>
 
-                <!-- /.box-header -->
                 <div class="box-body">
                     <button type="button" class="btn btn-lg bg-purple color-palette fa fa-plus" data-toggle="modal"
                         data-target="#modal-add-barang">
                         Tambah Barang
                     </button>
-                    <a href="/pimpinan/barang/trash" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
+                    <a href="{{ route('recycle-barang') }}" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
                 </div>
 
 
@@ -113,7 +99,7 @@
                         </tbody>
                     </table>
 
-                    <!-- Modal Add Barang-->
+                    <!-- Modal tambah jenis barang-->
                     <div class="modal fade" id="modal-add-barang">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -125,7 +111,7 @@
                                 </div>
 
                                 <div class="modal-body">
-                                    <form action="/pimpinan/barang/store" method="POST" id="upload-image-form"
+                                    <form action="{{ route('post-barang') }}" method="POST" id="upload-image-form"
                                         enctype="multipart/form-data">
                                         @csrf
                                         <div class="box-body">
@@ -224,12 +210,10 @@
                                     </form>
                                 </div>
                             </div>
-                            <!-- /.modal-dialog -->
                         </div>
-                        <!-- /.modal add -->
                     </div>
 
-                    <!-- Modal Tambah Stok -->
+                    <!-- Modal tambah stok -->
                     @foreach ($barang as $data)
                         <div class="modal fade" id="modal-tambah{{ $data->id }}">
                             <div class="modal-dialog">
@@ -242,14 +226,15 @@
                                     </div>
 
                                     <div class="modal-body">
-                                        <form action="/pimpinan/barang/tambah/{{ $data->id }}" method="POST"
+                                        <form action="{{ route('post-stok', $data->id) }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="box-body">
                                                 <div class="form-group">
                                                     <label>Stok Tersedia</label>
                                                     <label class="text-danger">*</label>
-                                                    <input type="text" name="stok_tersedia" class="form-control" value="{{ $data->stok }}" readonly>
+                                                    <input type="text" name="stok_tersedia" class="form-control"
+                                                        value="{{ $data->stok }}" readonly>
                                                     <div class="text-danger">
                                                         @error('stok_tersedia')
                                                             {{ $message }}
@@ -259,7 +244,8 @@
                                                 <div class="form-group">
                                                     <label>Tambah Stok</label>
                                                     <label class="text-danger">*</label>
-                                                    <input type="text" name="tambah_stok" class="form-control" placeholder="Contoh: 200">
+                                                    <input type="text" name="tambah_stok" class="form-control"
+                                                        placeholder="Contoh: 200">
                                                     <div class="text-danger">
                                                         @error('tambah_stok')
                                                             {{ $message }}
@@ -277,9 +263,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <!-- /.modal-dialog -->
                             </div>
-                            <!-- /.modal add -->
                         </div>
                     @endforeach
 
@@ -296,7 +280,7 @@
                                     </div>
 
                                     <div class="modal-body">
-                                        <form action="/pimpinan/barang/update/{{ $data->id }}" method="POST"
+                                        <form action="{{ route('update-barang', $data->id) }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="box-body">
@@ -379,9 +363,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <!-- /.modal-dialog -->
                             </div>
-                            <!-- /.modal add -->
                         </div>
                     @endforeach
 
@@ -405,22 +387,15 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default pull-left"
                                             data-dismiss="modal">Tidak</button>
-                                        <a href="/pimpinan/barang/delete/{{ $data->id }}"
+                                        <a href="{{ route('delete-barang', $data->id) }}"
                                             class="btn btn-danger">Ya!</a>
                                     </div>
                                 </div>
-                                <!-- /.modal-content -->
                             </div>
-                            <!-- /.modal-dialog -->
                         </div>
-                        <!-- /.modal -->
                     @endforeach
-
                 </div>
-                <!-- /.box-body -->
             </div>
-            <!-- /.box -->
         </div>
-        <!-- /.row -->
     </section>
 @endsection

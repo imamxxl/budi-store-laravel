@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\pimpinan;
+namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
@@ -14,14 +14,12 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    // Melihat tampilan index user
+
     public function index()
     {
 
-        // $user = DB::table('users')->get();
         $user = User::All();
 
-        // making user unique
         $identity_admin = 'ADM';
         $identity_pimpinan = 'PP';
         $random_number = random_int(100, 222);
@@ -29,19 +27,18 @@ class UserController extends Controller
         $admin = $identity_admin . $random_number;
         $pimpinan = $identity_pimpinan . $random_number;
 
-        return view('pimpinan.user.user', compact('pimpinan', 'admin', 'user'));
+        return view('page.user.user', compact('pimpinan', 'admin', 'user'));
     }
 
-    // Melihat user yang dihapus dan restore
-    function indexTrash()
+    public function indexRecycle()
     {
         $user = User::onlyTrashed()->get();
-        return view('pimpinan.user.user_trash', compact('user'));
+        return view('page.user.recycle-user', compact('user'));
     }
 
-    // Menyimpan data pimpinan
-    public function storePimpinan(Request $request)
+    public function postPimpinan(Request $request)
     {
+        
         $validator = Validator::make(
             $request->all(),
             [
@@ -72,7 +69,6 @@ class UserController extends Controller
                 ->with('pesan-gagal', 'Data gagal ditambahkan. Mohon cek kembali data yang ingin dimasukkan!');
         }
 
-        // created_at & updated_at
         $created_at = date('Y-m-d H:i:s');
         $updated_at = date('Y-m-d H:i:s');
 
@@ -83,7 +79,6 @@ class UserController extends Controller
             $photo = $request->file('avatar_pimpinan');
             $fileName = $request->username_admin . '.' . $photo->getClientOriginalExtension();
             $file->move(public_path('/avatar'), $fileName);
-            // $location = public_path('avatar/' . $fileName);
         }
 
         $data = $request->all();
@@ -102,8 +97,7 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
-    // Menyimpan data admin
-    public function storeAdmin(Request $request)
+    public function postAdmin(Request $request)
     {
         $validator = Validator::make(
             $request->all(),
@@ -135,7 +129,6 @@ class UserController extends Controller
                 ->with('pesan-gagal', 'Data gagal ditambahkan. Mohon cek kembali data yang ingin dimasukkan!');
         }
 
-        // created_at & updated_at
         $created_at = date('Y-m-d H:i:s');
         $updated_at = date('Y-m-d H:i:s');
 
@@ -146,7 +139,7 @@ class UserController extends Controller
             $photo = $request->file('avatar_admin');
             $fileName = $request->username_admin . '.' . $photo->getClientOriginalExtension();
             $file->move(public_path('/avatar'), $fileName);
-            // $location = public_path('avatar/' . $fileName);
+
         }
 
         $data = $request->all();
@@ -165,7 +158,7 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil ditambahkan.');
     }
 
-    // update data user
+
     public function update(Request $request, $id)
     {
         $validator = Validator::make(
@@ -193,7 +186,6 @@ class UserController extends Controller
                 ->with('pesan-gagal', 'Data gagal diupdate. Mohon cek kembali data yang ingin diupdate!');
         }
 
-        // updated_at
         $updated_at = date('Y-m-d H:i:s');
 
         $password = $request->edit_password;
@@ -222,8 +214,7 @@ class UserController extends Controller
         }
     }
 
-    // softdelete user
-    function delete($id)
+    public function delete($id)
     {
         $user = User::find($id);
         $user->delete();
@@ -231,21 +222,18 @@ class UserController extends Controller
         return redirect()->route('user')->with('pesan-sukses', 'Data berhasil dihapus.');
     }
 
-    // restore data user yang dihapus
-    function restore($id)
+    public function restore($id)
     {
         $user = User::onlyTrashed()->where('id', $id);
         $user->restore();
-        return redirect()->route('trash')->with('pesan-sukses', 'Data berhasil direstore.');
+        return redirect()->route('recycle-user')->with('pesan-sukses', 'Data berhasil direstore.');
     }
 
-    // delete data permanen
-    function destroy($id)
+    public function destroy($id)
     {
-        // hapus permanen data user
         $user = User::onlyTrashed()->where('id', $id);
         $user->forceDelete();
 
-        return redirect()->route('trash')->with('pesan-sukses', 'Data berhasil dihapus permanen.');
+        return redirect()->route('recycle-user')->with('pesan-sukses', 'Data berhasil dihapus permanen.');
     }
 }

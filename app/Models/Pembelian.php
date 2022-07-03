@@ -8,8 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pembelian extends Model
 {
+    // protected $fillable = [
+    //     'barang_id', 'quantity', 'jmlh_bayar',
+    // ];
+
     use SoftDeletes;
 
-    protected $table = "barangs";
+    protected $table = "pembelians";
     protected $dates = ['deleted_at'];
 }

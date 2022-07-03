@@ -63,16 +63,7 @@
                         data-target="#modal-tambah-admin">
                         Tambah User Admin
                     </button>
-                    <a href="/user/trash" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
-                    {{-- <button type="button" class="btn btn-lg btn-primary fa fa-plus" data-toggle="modal"
-                        data-target="#modal-add-dosen">
-                        Tambah User Dosen
-                    </button>
-                    <button type="button" class="btn btn-lg bg-purple color-palette fa fa-plus" data-toggle="modal"
-                        data-target="#modal-add-admin">
-                        Tambah User Admin
-                    </button>
-                    <a href="/user/nonaktif" class="btn btn-lg btn-default fa fa-eye"> Lihat User Nonaktif </a> --}}
+                    <a href="{{ route('recycle-user') }}" class="btn btn-lg btn-default fa fa-trash"> Tong Sampah </a>
                 </div>
 
 
@@ -135,7 +126,7 @@
                                 </div>
 
                                 <div class="modal-body">
-                                    <form action="/user/tambah_pimpinan" method="POST" enctype="multipart/form-data">
+                                    <form action=" {{ route('post-pimpinan') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="box-body">
                                             <div class="form-group">
@@ -238,7 +229,7 @@
                                 </div>
 
                                 <div class="modal-body">
-                                    <form action="/user/tambah_admin" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('post-admin') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="box-body">
                                             <div class="form-group">
@@ -342,7 +333,7 @@
                                     </div>
 
                                     <div class="modal-body">
-                                        <form action="/user/update/{{ $data->id }}" method="POST"
+                                        <form action="{{ route('update-user', $data->id) }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="box-body">
@@ -453,7 +444,7 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default pull-left"
                                             data-dismiss="modal">Tidak</button>
-                                        <a href="/user/delete/{{ $data->id }}" class="btn btn-danger">Ya!</a>
+                                        <a href="{{ route('delete-user', $data->id) }}" class="btn btn-danger">Ya!</a>
                                     </div>
                                 </div>
                                 <!-- /.modal-content -->

@@ -1,12 +1,11 @@
 <?php
 
-use App\Http\Controllers\admin\BarangController;
-use App\Http\Controllers\admin\DashboardController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\pimpinan\BarangController as PimpinanBarangController;
-use App\Http\Controllers\pimpinan\PembelianController;
-use App\Http\Controllers\pimpinan\UserController;
-use App\Http\Middleware\CekLevel;
+use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,43 +19,55 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
-// Login
+// Route untuk Logina
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/cek-login', [LoginController::class, 'cekLogin'])->name('cek-login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// Login dengan level pimpinan dan admin
 Route::group(['middleware' => ['auth', 'ceklevel:pimpinan,admin']], function () {
+
+    // Default Page
+    Route::get('/', function () {
+        return view('welcome');
+    });
+
     // CRUD Barang
-    Route::get('/pimpinan/barang', [PimpinanBarangController::class, 'index'])->name('crud-barang');
-    Route::post('/pimpinan/barang/store', [PimpinanBarangController::class, 'store']);
-    Route::post('/pimpinan/barang/update/{id}', [PimpinanBarangController::class, 'update']);
-    Route::get('/pimpinan/barang/delete/{id}', [PimpinanBarangController::class, 'delete']);
-    Route::get('/pimpinan/barang/trash', [PimpinanBarangController::class, 'indexTrash'])->name('barang-trash');
-    Route::get('/pimpinan/barang/destroy/{id}', [PimpinanBarangController::class, 'destroy']);
-    Route::post('/pimpinan/barang/tambah/{id}', [PimpinanBarangController::class, 'tambah']);
-    Route::get('/pimpinan/barang/restore/{id}', [PimpinanBarangController::class, 'restore']);
+    Route::get('/semua-barang', [BarangController::class, 'index'])->name('semua-barang');
+    Route::post('/post-barang', [BarangController::class, 'postBarang'])->name('post-barang');
+    Route::post('/update-barang/{id}', [BarangController::class, 'update'])->name('update-barang');
+    Route::post('/post-stok/{id}', [BarangController::class, 'postStok'])->name('post-stok');
+    Route::get('/recycle-barang', [BarangController::class, 'indexRecycle'])->name('recycle-barang');
+    Route::get('/restore-barang/{id}', [BarangController::class, 'restore'])->name('restore-barang');
+    Route::get('/delete-barang/{id}', [BarangController::class, 'delete'])->name('delete-barang');
+    Route::get('/destroy-barang/{id}', [BarangController::class, 'destroy'])->name('destroy-barang');
 
     // Pembelian
     Route::get('/pimpinan/pembelian', [PembelianController::class, 'index'])->name('pembelian');
+    Route::post('/beli-barang/{id}', [PembelianController::class, 'beli'])->name('beli');
 
-    // For Admin
+    // transaksi
+    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
+    // Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
+    Route::post('/post-chekout/{id}', [TransaksiController::class, 'postChekout'])->name('post-chekout');
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/barang', [BarangController::class, 'index'])->name('barang');
     Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian');
 });
 
+// Login khusus untuk pimpinan
 Route::group(['middleware' => ['auth', 'ceklevel:pimpinan']], function () {
+
     // CRUD User
     Route::get('/user', [UserController::class, 'index'])->name('user');
-    Route::post('/user/tambah_admin', [UserController::class, 'storeAdmin']);
-    Route::post('/user/tambah_pimpinan', [UserController::class, 'storePimpinan']);
-    Route::post('/user/update/{id}', [UserController::class, 'update']);
-    Route::get('/user/delete/{id}', [UserController::class, 'delete']);
-    Route::get('/user/trash', [UserController::class, 'indexTrash'])->name('trash');
-    Route::get('/user/restore/{id}', [UserController::class, 'restore']);
-    Route::get('/user/destroy/{id}', [UserController::class, 'destroy']);
+    Route::post('/post-admin', [UserController::class, 'postAdmin'])->name('post-admin');
+    Route::post('/post-pimpinan', [UserController::class, 'postPimpinan'])->name('post-pimpinan');
+    Route::post('/update-user/{id}', [UserController::class, 'update'])->name('update-user');
+    Route::get('/delete-user/{id}', [UserController::class, 'delete'])->name('delete-user');
+    Route::get('/recycle-user', [UserController::class, 'indexRecycle'])->name('recycle-user');
+    Route::get('/restore-user/{id}', [UserController::class, 'restore'])->name('restore-user');
+    Route::get('/destroy-user/{id}', [UserController::class, 'destroy'])->name('destroy-user');
+
 });
