@@ -17,7 +17,6 @@ class TransaksiController extends Controller
 {
     public function index()
     {
-
         $transaksi = DB::table('transaksis')
             ->get();
 
@@ -32,8 +31,6 @@ class TransaksiController extends Controller
         $hitung_barang = DB::table('tmps')
             ->join('barangs', 'barangs.id', '=', 'tmps.barang_id')
             ->pluck('quantity');
-
-        // dd($hitung_barang);
 
         $invoice = 'T-' . random_int(100000000000000, 999999999999999);
 
@@ -85,16 +82,22 @@ class TransaksiController extends Controller
                 ->with('pesan-gagal', 'Barang gagal ditambahkan. Mohon cek kembali data yang ingin dimasukkan!');
         }
 
+        // Deteksi Transaksi
+        $transaksi_id = DB::table('transaksis')
+            ->where('user_id', Auth::user()->id)
+            ->pluck('id')
+            ->first();
+
         // Deteksi kode barang
         $kode_barang = $request->input('kode_barang');
 
         // Deteksi quantity
         $quantity = $request->input('qty');
 
-
         // Deteksi Invoice
         $get_invoice = DB::table('transaksis')
             ->where('user_id', Auth::user()->id)
+            ->where('id', $transaksi_id)
             ->pluck('id')
             ->first();
 
@@ -105,6 +108,7 @@ class TransaksiController extends Controller
 
         // Cek barang di database apakah ada atau tidak
         $cek_barang_db = DB::table('tmps')
+            ->where('transaksi_id', $transaksi_id)
             ->where('barang_id', $kode_barang)
             ->count();
 
@@ -112,41 +116,98 @@ class TransaksiController extends Controller
         $cek_qty_db = DB::table('tmps')
             ->join('barangs', 'barangs.id', '=', 'tmps.barang_id')
             ->where('barang_id', $kode_barang)
+            ->where('transaksi_id', $transaksi_id)
             ->pluck('quantity')
             ->first();
 
-        // cek total jumlah  barang yang dibeli
-        $sub_total = $cek_harga_barang * $cek_qty_db;
+        if ($cek_qty_db == 0) {
+            $sub_total = $cek_harga_barang * $quantity;
+            $c_total_harga = $quantity * $cek_harga_barang;
+        } else {
+            // cek total jumlah  barang yang dibeli
+            $sub_total = $cek_harga_barang * ($cek_qty_db + $quantity);
+            $c_total_harga = ($quantity + $cek_qty_db) * $cek_harga_barang ;
+        }
+
+        $jumlah = $cek_harga_barang * ($cek_qty_db + $quantity);
 
         // cek jumlah barang supaya discount
-        if ($cek_qty_db >= 10) {
-            $discount = $sub_total * 5 / 100;
+        if ($cek_qty_db >= 9) {
+            $discount = $sub_total * 0.05;
         } else {
             $discount = 0;
         }
 
+        // total belanja dikurangi diskon
+        $total = ($sub_total - $discount);
+
+        // Mengambil array jumlah barang pembelian
+        $total_barang_pembelian = DB::table('tmps')
+            ->join('barangs', 'barangs.id', '=', 'tmps.barang_id')
+            ->where('transaksi_id', $transaksi_id)
+            ->pluck('total');
+
+        // Mengambil array jumlah discount pembelian
+        $total_discount_pembelian = DB::table('tmps')
+            ->join('barangs', 'barangs.id', '=', 'tmps.barang_id')
+            ->where('transaksi_id', $transaksi_id)
+            ->pluck('discount');
+
+        // Mengambil array harga pembelian
+        $total_harga_pembelian = DB::table('tmps')
+            ->join('barangs', 'barangs.id', '=', 'tmps.barang_id')
+            ->where('transaksi_id', $transaksi_id)
+            ->pluck('jumlah');
+
         // Jika barang belum pernah ditambahkan
         if ($cek_barang_db == '0') {
+            // Menyimpan ke tabel tmp
             $tmp = new Tmp;
             $tmp->barang_id = $request->kode_barang;
             $tmp->quantity = $quantity;
-            $tmp->transaksi_id = $get_invoice;
+            $tmp->jumlah = $jumlah;
             $tmp->discount = $discount;
+            $tmp->total = $total;
+            $tmp->transaksi_id = $get_invoice;
             $tmp->save();
+
+
+            DB::table('transaksis')
+                ->where('id', $transaksi_id)
+                ->update(
+                    ['sub_total' => $c_total_harga]
+                );
 
             return redirect()->route('transaksi')->with('pesan-sukses', 'Barang berhasil ditambahkan.');
         }
 
         // Jika barang sudah pernah ditambahkan 
         else {
+
             // Mengganti qty barang
             $tambah_quantity = $cek_qty_db + $quantity;
 
             DB::table('tmps')
                 ->where('barang_id', $kode_barang)
+                ->where('transaksi_id', $transaksi_id)
                 ->update(
-                    ['quantity' => $tambah_quantity],
-                    ['discount' => $discount]
+                    ['quantity' => $tambah_quantity, 'jumlah' => $jumlah, 'discount' => $discount, 'total' => $total]
+                );
+
+            // menghitung total semua array
+            $c_total_harga = ($total_harga_pembelian)->sum() + ($quantity * $cek_harga_barang);
+            $c_total_discount = ($total_discount_pembelian)->sum() + ($quantity * $cek_harga_barang);
+            $c_total_barang = ($total_barang_pembelian)->sum() + ($quantity * $cek_harga_barang);
+
+            // Potongan discount
+            $c_grand_total = $c_total_barang
+                - $c_total_discount;
+
+
+            DB::table('transaksis')
+                ->where('id', $transaksi_id)
+                ->update(
+                    ['sub_total' => $c_total_harga, 'total_discount' => $c_total_discount, 'grand_total' => $c_grand_total]
                 );
 
             return redirect()->route('transaksi')->with('pesan-sukses', 'Barang berhasil ditambahkan.');

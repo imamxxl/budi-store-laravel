@@ -10,9 +10,9 @@
         <li class="{{ request()->is('semua-barang', 'recycle-barang') ? 'active' : '' }}">
             <a href="/semua-barang"><i class="fa fa-file-text"></i> <span>Barang</span></a>
         </li>
-        <li class="{{ request()->is('pembelian') ? 'active' : '' }}">
+        {{-- <li class="{{ request()->is('pembelian') ? 'active' : '' }}">
             <a href="/pembelian"><i class="fa fa-pencil-square-o"></i> <span>Pembelian</span></a>
-        </li>
+        </li> --}}
         <li class="{{ request()->is('transaksi', '') ? 'active' : '' }}">
             <a href="/transaksi"><i class="fa fa-shopping-cart"></i> <span>Transaksi</span></a>
         </li>
@@ -30,9 +30,9 @@
         <li class="{{ request()->is('barang', 'barang/trash') ? 'active' : '' }}">
             <a href="/barang"><i class="fa fa-file-text"></i> <span>Barang</span></a>
         </li>
-        <li class="{{ request()->is('pembelian') ? 'active' : '' }}">
+        {{-- <li class="{{ request()->is('pembelian') ? 'active' : '' }}">
             <a href="/pembelian"><i class="fa fa-pencil-square-o"></i> <span>Pembelian</span></a>
-        </li>
+        </li> --}}
         <li class="{{ request()->is('transaksi') ? 'active' : '' }}">
             <a href="/transaksi"><i class="fa fa-shopping-cart"></i> <span>Transaksi</span></a>
         </li>

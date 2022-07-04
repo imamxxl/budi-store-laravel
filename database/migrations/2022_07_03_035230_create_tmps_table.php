@@ -18,8 +18,9 @@ class CreateTmpsTable extends Migration
             $table->unsignedBigInteger('barang_id')->nullable();
             $table->foreign('barang_id')->references('id')->on('barangs')->onDelete('cascade');
             $table->integer('quantity')->nullable();
+            $table->integer('jumlah')->nullable();
             $table->integer('discount')->nullable();
-            $table->text('catatan')->nullable();
+            $table->integer('total')->nullable();
             $table->unsignedBigInteger('transaksi_id')->nullable();
             $table->foreign('transaksi_id')->references('id')->on('transaksis')->onDelete('cascade');
             $table->timestamps();

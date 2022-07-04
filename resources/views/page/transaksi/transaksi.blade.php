@@ -147,7 +147,7 @@
                                 <th>Nama</th>
                                 <th>Qty</th>
                                 <th>Harga</th>
-                                <th>Discount (5%)</th>
+                                <th>Discount 5% <br> (min. beli 10)</th>
                                 <th>Total</th>
                                 <th>Aksi</th>
                             </tr>
@@ -162,9 +162,9 @@
                                     <td>{{ $data->kode_barang }}</td>
                                     <td>{{ $data->nama_barang }}</td>
                                     <td>{{ $data->quantity }}</td>
-                                    <td>Rp. {{ $data->harga }}</td>
-                                    <td>{{ $data->discount }}</td>
-                                    <td>{{ $data->stok }}</td>
+                                    <td>Rp. {{ $data->harga }},-</td>
+                                    <td>Rp. {{ $data->discount }},-</td>
+                                    <td>Rp. {{ $data->total }},-</td>
                                     <td>
                                         <button type="button" class="btn btn-sm bg-blue" data-toggle="modal"
                                             data-target="#modal-edit{{ $data->id }}">
@@ -412,21 +412,23 @@
                     <!-- form start -->
                     <form role="form">
                         <div class="box-body">
-                            <div class="form-group">
-                                <label>Sub Total</label>
-                                <input type="email" class="form-control" id="exampleInputEmail1" name="tanggal"
-                                    value="" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label>Discount</label>
-                                <input type="text" class="form-control" id="exampleInputPassword1" value=""
-                                    readonly>
-                            </div>
-                            <div class="form-group">
-                                <label>Grand total</label>
-                                <input type="text" class="form-control" id="exampleInputPassword1" value=""
-                                    readonly>
-                            </div>
+                            @foreach ($transaksi as $data)
+                                <div class="form-group">
+                                    <label>Sub Total</label>
+                                    <input type="email" class="form-control" id="sub_total" name="tanggal"
+                                        value="{{ $data->sub_total }}" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Discount</label>
+                                    <input type="text" class="form-control" id="discount" value="{{ $data->total_discount }}"
+                                        readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Grand total</label>
+                                    <input type="text" class="form-control" id="grand_total" value="{{ $data->grand_total }}"
+                                        readonly>
+                                </div>
+                            @endforeach
                         </div>
 
                     </form>
@@ -441,11 +443,11 @@
                         <form role="form">
                             <div class="form-group">
                                 <label>Cash</label>
-                                <input type="text" class="form-control" value="">
+                                <input type="text" class="form-control" value="" onkeyup="kembali(this)">
                             </div>
                             <div class="form-group">
                                 <label>Kembalian</label>
-                                <input type="text" class="form-control" readonly>
+                                <input id="kembalian" type="text" class="form-control" readonly>
                             </div>
                         </form>
                     </div>
@@ -464,7 +466,7 @@
                             <!-- text input -->
                             <div class="form-group">
                                 <label>Catatan</label>
-                                <p style="font-size:2vw"> <b>T-12HSJ232S</b></p>
+                                <textarea class="form-control" rows="3" placeholder="Enter ..." name="catatan"></textarea>
                             </div>
                         </form>
                     </div>
@@ -504,4 +506,14 @@
 
         $('#total_biaya').val(qty * harga);
     });
+
+    function kembali(nilai) {
+        $('#kembalian').val(0)
+        var grand_total = $('#grand_total').val()
+        var cash = nilai.value
+        var kembalian = cash - grand_total
+        if (nilai.value != '') {
+            $('#kembalian').val(kembalian)
+        }
+    }
 </script>
